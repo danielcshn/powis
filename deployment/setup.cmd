@@ -4,6 +4,14 @@ TITLE Windows Setup Launcher
 CLS
 
 
+REM Set WinPe language
+for /f "tokens=3 delims= " %%i in ('reg query "HKEY_USERS\.DEFAULT\Control Panel\International" /v "LocaleName"') do (
+	%WINDIR%\System32\wpeutil.exe SetMuiLanguage %%i >nul
+	%WINDIR%\System32\wpeutil.exe SetUserLocale %%i >nul
+
+)
+
+
 REM Get DVD / USB drive
 FOR %%I IN (A B C D E F G H I J K L M N O P Q R S T U V W X Y Z) DO IF EXIST "%%I:\sources\install.esd" SET DRIVE=%%I:&&SET INSTALL=install.esd
 IF "%DRIVE%" == "" FOR %%I IN (A B C D E F G H I J K L M N O P Q R S T U V W X Y Z) DO IF EXIST "%%I:\sources\install.wim" SET DRIVE=%%I:&&SET INSTALL=install.wim
@@ -19,13 +27,14 @@ IF EXIST "%DRIVE%\settings.ini" (
 )
 
 
+
 SETLOCAL ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
 
 IF "%UNATTENDEDTYPE%" == "Select" (
 
 	SET /A XMLCOUNT=0
 
-	FOR /f "delims=" %%I IN ('dir /b /o:gn "%DRIVE%\*.xml"') DO (
+	FOR /f "delims=" %%I IN ('dir /b /o:gn "%DRIVE%\*.xml" 2^>nul') DO (
 	 	IF NOT "%%I" == "skiprecovery.xml" (
 			SET FileName=%%I
 			SET FileName=!FileName:~0,10!
@@ -42,7 +51,7 @@ IF "%UNATTENDEDTYPE%" == "Select" (
 		ECHO.
 		
 		SET /A XMLCOUNT=0
-		FOR /F "delims=" %%I IN ('dir /b /o:gn "%DRIVE%\*.xml"') DO (
+		FOR /F "delims=" %%I IN ('dir /b /o:gn "%DRIVE%\*.xml" 2^>nul') DO (
 		
 			IF NOT "%%I" == "skiprecovery.xml" (
 				SET FileName=%%I
@@ -60,7 +69,7 @@ IF "%UNATTENDEDTYPE%" == "Select" (
 
 		
 		SET /A XMLCOUNT=0
-		FOR /F "delims=" %%I IN ('dir /b /o:gn "%DRIVE%\*.xml"') DO (
+		FOR /F "delims=" %%I IN ('dir /b /o:gn "%DRIVE%\*.xml" 2^>nul') DO (
 
 		
 			IF NOT "%%I" == "skiprecovery.xml" (
@@ -86,7 +95,6 @@ IF "%UNATTENDEDTYPE%" == "Select" (
 
 
 IF DEFINED SELECTEDFILE SET UNATTENDEDFILE=!SELECTEDFILE!
-
 
 
 REM Run original setup.exe
@@ -290,10 +298,11 @@ IF EXIST "%TARGET%" (
 	if exist %TEMP%\Drivers.xml del /q /s %TEMP%\Drivers.xml >nul
 
 	REM Ability for custom scripting after first reboot
-	reg load HKLM\TEMPSYSTEM "%TARGET%\Windows\System32\config\SYSTEM" >nul
-	REG ADD "HKLM\TEMPSYSTEM\Setup" /v "CmdLine" /t REG_SZ /d "C:\Windows\System32\wscript.exe //nologo C:\Windows\setup\scripts\invisible.vbs C:\Windows\setup\scripts\WinDeploy.cmd" /f >nul
-	reg unload HKLM\TEMPSYSTEM >nul
-
+	if exist "%DRIVE%\sources\$OEM$\$$\setup\scripts\WinDeploy.cmd" (
+		reg load HKLM\TEMPSYSTEM "%TARGET%\Windows\System32\config\SYSTEM" >nul
+		REG ADD "HKLM\TEMPSYSTEM\Setup" /v "CmdLine" /t REG_SZ /d "C:\Windows\System32\wscript.exe //nologo C:\Windows\setup\scripts\invisible.vbs C:\Windows\setup\scripts\WinDeploy.cmd" /f >nul
+		reg unload HKLM\TEMPSYSTEM >nul
+	)
 
 	REM Windows 8 and newer need this tweak to avoid insane long Login screen before RunOnceEx
 	reg load HKLM\TEMPSOFTWARE "%TARGET%\Windows\System32\config\SOFTWARE" >nul
@@ -307,12 +316,7 @@ IF EXIST "%TARGET%" (
 
 REM Perform reboot
 IF EXIST "X:\sources\launcher.exe" (
-	IF NOT EXIST "%DRIVE%\skiprecovery.xml" (
-		%WINDIR%\System32\wpeutil.exe reboot
-		EXIT
-	) ELSE (
-		EXIT
-	)
+	%WINDIR%\System32\wpeutil.exe reboot
 ) ELSE (
 	IF EXIST "%TARGET%" (
 		%WINDIR%\System32\shutdown.exe -r -f -t 0

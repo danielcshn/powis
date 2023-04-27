@@ -1,6 +1,10 @@
+15.07.2021 - v1.0.3 - Added RunOnceEx Swedish (sv-SE) translation
+                    - Added Activation plugin folder and moved Activate.cmd inside
+                    - Improved setup.cmd for more customizable builds
+
 01.07.2021 - v1.0.2 - Added RunOnceEx Greek (el-GR), Turkish (tr-TR) and Romanian (ro-RO) translations
                     - Added install.esd input support - Now you can use POWIS on setup with install.esd 
-					- Added Themes and Wallpapers plugin folders
+                    - Added Themes and Wallpapers plugin folders
                     - Added many new customizable options into config.ini	
                     - Fixed AutoUnattended selector
                     - Fixed Num Lock default settings in WinPE

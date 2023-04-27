@@ -27,6 +27,7 @@ call :ReadINI OFFICE OFFICE
 call :ReadINI UPDATES UPDATES
 call :ReadINI SETUPS SETUPS
 call :ReadINI UNATTENDEDS UNATTENDEDS
+call :ReadINI ACTIVATION ACTIVATION
 
 
 if "%~1" == "/?" (
@@ -160,8 +161,6 @@ copy /y "%~dp0deployment\WinDeploy.cmd" "%IMAGE%\sources\$OEM$\$$\setup\scripts\
 copy /y "%~dp0deployment\Watcher.cmd" "%IMAGE%\sources\$OEM$\$$\setup\scripts\Watcher.cmd" >nul
 copy /y "%~dp0deployment\invisible.vbs" "%IMAGE%\sources\$OEM$\$$\setup\scripts\invisible.vbs" >nul
 
-if not exist "%IMAGE%\support" md "%IMAGE%\support"
-copy /y "%~dp0Activate.cmd" "%IMAGE%\support\Activate.cmd" >nul
 
 
 echo [Settings]>"%IMAGE%\settings.ini"
@@ -343,7 +342,9 @@ if "%SKIPEULAKEY%" == "Yes" (
 if "%UNATTENDEDS%" == "Yes" (
 	set /a STEP+=1
 	echo  [!STEP!] Adding Unattended files
-		
+	
+	if exist "%IMAGE%\autounattend.xml" ren "%IMAGE%\autounattend.xml" "Autounattend-Original.xml" >nul
+	
 	REM Custom unattended files
 	copy /y "%~dp0plugins\unattended\*.xml" "%IMAGE%\" >nul 2>nul
 
@@ -446,6 +447,14 @@ if "%UPDATES%" == "Yes" (
 )
 
 
+if "%ACTIVATION%" == "Yes" (
+
+	set /a STEP+=1
+	echo  [%STEP%] Adding Activation support	
+	
+	if not exist "%IMAGE%\support" md "%IMAGE%\support"
+	xcopy /s /y /e "%~dp0plugins\activation" "%IMAGE%\support\" >nul
+)
 
 
 set /a STEP+=1
