@@ -1,0 +1,14 @@
+01.07.2021 - v1.0.2 - Added RunOnceEx Greek (el-GR), Turkish (tr-TR) and Romanian (ro-RO) translations
+                    - Added install.esd input support - Now you can use POWIS on setup with install.esd 
+					- Added Themes and Wallpapers plugin folders
+                    - Added many new customizable options into config.ini	
+                    - Fixed AutoUnattended selector
+                    - Fixed Num Lock default settings in WinPE
+                    - Fixed WinRE.wim name and description
+                    - Fixed RunOnceEx on NTLited images without Internet Explorer
+				   
+27.05.2021 - v1.0.1 - Added RunOnceEx Slovenian (sl-SI) and Croatian (hr-HR) translations
+                    - Added DISM 10.0.19041.1 - now can POWIS run under Windows 7 host without problem
+                    - Fixed forgoten visible logs during upgrading setup engine 
+
+24.05.2021 - v1.0 - First public release

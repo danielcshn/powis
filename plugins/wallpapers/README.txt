@@ -1,0 +1,1 @@
+Add any backgrounds into this folder and you will find them after setup in %WINDIR%\Web\Wallpaper
